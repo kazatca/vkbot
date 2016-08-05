@@ -1,7 +1,9 @@
 var VK = require('./lib/vk.js');
 var captchaSolver = require('./lib/2captcha.js');
 
+var logger= require('log4js').getLogger()
 
+logger.setLevel('TRACE');
 
 var vk = new VK(process.env.VK_EMAIL, process.env.VK_PASS, process.env.VK_CLIENTID)
 vk.setDb(process.env.DB_URL);
@@ -28,10 +30,19 @@ function inviteAll(vk, fromGroup, toEvent){
     return members.reduce(function(promise, member){
       return promise.then(function(){
         return vk.groups.invite(toEvent, member)
-        .catch(function(err){
-          console.error(err);
+        .then(function(resp) {
+          if(resp == 1){
+            logger.trace('invited', member);
+          }
         })
-        .then(console.log)
+        .catch(function(err){
+          if(err.error_code == 15){
+            logger.trace(err.error_msg, member);
+            return;
+          }
+          logger.error('invite error', err);
+          throw err;
+        })
         .then(wait(1000))
       })
     }, Promise.resolve())
