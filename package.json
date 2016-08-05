@@ -13,7 +13,24 @@
   "author": "kazatca@gmail.com",
   "license": "ISC",
   "dependencies": {
+    "2captcha": "^1.0.11",
     "cheerio": "^0.20.0",
+    "dotenv": "^2.0.0",
+    "mongodb": "^2.2.5",
     "request-promise": "^4.1.0"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true
+    },
+    "extends": [],
+    "globals": {},
+    "rules": {
+      "no-console": 0
+    }
+  },
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "mocha": "^3.0.1"
   }
 }
