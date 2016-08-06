@@ -1,9 +1,11 @@
 var VK = require('../lib/vk.js');
 var expect = require('expect.js');
+var logger = require('log4js').getLogger()
+logger.setLevel('ERROR');
 
 describe('vk', function() {
   var vk;
-  it('create app', function(done){
+  before(function(done){
     vk = new VK(process.env.VK_EMAIL, process.env.VK_PASS, process.env.VK_CLIENTID)
     vk.setDb(process.env.DB_URL)
     done();
@@ -31,6 +33,21 @@ describe('vk', function() {
     .then(function(members){
       expect(members).to.be.a('array');
       // console.log(members.length)
+    })
+  })
+
+  it('get invited users', function(){
+    return vk.groups.getInvitedUsers(126196049)
+    .then(function(users){
+      expect(users).to.be.a('array');
+    })
+  })
+
+  it('get messages', function(){
+    return vk.messages.getHistory(3600733)
+    .then(function(messages){
+      expect(messages).to.be.a('array')
+      // console.log(messages);
     })
   })
 })
