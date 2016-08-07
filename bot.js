@@ -34,7 +34,7 @@ function loop(){
   return getLastMessage()
   .then(function(message){
     if(message.from_id == abonent){
-      return handleCommand(message)
+      return handleCommand(message.body)
       .then(function(answer){
         if(answer){ 
           return vk.api('messages.send', {
