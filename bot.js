@@ -25,7 +25,7 @@ function handleCommand(message){
   if(message == 'кто ты?'){
     return Promise.resolve('я бот');
   }
-  Promise.resolve()
+  return Promise.resolve()
 }
 
 function loop(){
@@ -37,7 +37,7 @@ function loop(){
         if(answer){ 
           return vk.api('messages.send', {
             user_id: abonent,
-            message: result 
+            message: answer 
           })
         }
       })
