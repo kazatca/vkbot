@@ -21,13 +21,11 @@ function wait(delay){
 }
 
 function handleCommand(message){
-  var defer = Promise.defer();
   logger.debug(message)
   if(message == 'кто ты?'){
-    return defer.resolve('я бот');
+    return Promise.resolve('я бот');
   }
-  defer.resolve()
-  return defer.promise
+  Promise.resolve()
 }
 
 function loop(){
