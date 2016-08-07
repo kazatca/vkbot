@@ -37,7 +37,8 @@ function loop(){
         if(answer){ 
           return vk.api('messages.send', {
             user_id: abonent,
-            message: answer 
+            message: answer,
+            random_id: new Date()*1
           })
         }
       })
