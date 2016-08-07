@@ -16,7 +16,7 @@ function getLastMessage(){
 
 function wait(delay){
   defer = Promise.defer();
-  setTimeout(defer.resolve(), delay)
+  setTimeout(defer.resolve, delay)
   return defer;
 }
 
