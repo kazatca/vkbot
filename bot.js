@@ -5,7 +5,7 @@ var Bot = require('./lib/bot.js')
 var captchaSolver = require('./lib/2captcha.js');
 
 
-var dbUrl = process.env.DB_URL
+var dbUrl = process.env[process.env.DB_URL_KEY]
 
 var vk = new VK(process.env.VK_EMAIL, process.env.VK_PASS, process.env.VK_CLIENTID);
 vk.setDb(dbUrl)
