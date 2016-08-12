@@ -8,22 +8,11 @@ var testEvent = 126728658;
 
 var docUrl ='https://vk.com/doc-126604963_437738617?hash=f711b606041fe13bff&dl=1470974169b2a10568b19ccda37b&api=1'
 
-
-function getGroup(vk, id){
-  return vk.api('groups.getById', {
-    group_id: id,
-    fields: [
-      'links',
-      'status',
-      'fixed_post'
-    ].join(',')
-  })
-}
-
 describe('event builder', function() {
 
   var vk;
   var builder
+  
   before(function(done){
     vk = new VK(process.env.VK_EMAIL, process.env.VK_PASS, process.env.VK_CLIENTID)
     vk.setDb(process.env.DB_URL)
@@ -114,17 +103,9 @@ describe('event builder', function() {
   })
 
   it('create event', function() {
-    return builder.create('Мелькомбинат 2way', '1.01.2017')
+    return builder.create('Мелькомбинат 2way', '2.01.2000')
   })
 
-  it('download doc', function() {
-    return vk.docs.download(docUrl, '/tmp/vkdoc'+(new Date()*1))
-
-  })
-
-  it('upload doc', function(){
-    return vk.docs.upload(testEvent, './file.doc')
-  })
 
   it('copy doc', function(){
     return vk.docs.uploadToGroup(testEvent, {
@@ -132,6 +113,14 @@ describe('event builder', function() {
       title: 'Тестовый документ '+ (new Date()*1) +'.doc'
     })
   })
+
+  it('update logo', function () {
+    return builder.setLogo({
+      url: 'http://cs636724.vk.me/v636724930/2eccf/a5zszwky7U8.jpg',
+      text: '362,74,357'
+    }, testEvent)
+  })
+
 
   it('get videos', function(){
     return builder.getVideos(protoEvent)
@@ -144,10 +133,5 @@ describe('event builder', function() {
     })
   })
 
-  it('update logo', function () {
-    return builder.setLogo({
-      url: 'http://cs636724.vk.me/v636724930/2eccf/a5zszwky7U8.jpg',
-    }, testEvent)
-  })
 
 });
