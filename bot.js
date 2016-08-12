@@ -5,13 +5,15 @@ var Bot = require('./lib/bot.js')
 var captchaSolver = require('./lib/2captcha.js');
 
 
+var dbUrl = process.env.DB_URL
+
 var vk = new VK(process.env.VK_EMAIL, process.env.VK_PASS, process.env.VK_CLIENTID);
-vk.setDb(process.env.DB_URL)
+vk.setDb(dbUrl)
 captchaSolver.init(process.env.CAPTCHA_SOLVER_TOKEN)
 vk.setCaptchaSolver(captchaSolver);
 
 var bot = new Bot(vk)
-bot.setDb(process.env.DB_URL)
+bot.setDb(dbUrl)
 
 var master = 3600733
 
