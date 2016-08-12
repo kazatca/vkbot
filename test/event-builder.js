@@ -3,12 +3,11 @@ var EventBuilder = require('../lib/event-builder.js')
 var expect= require('expect.js')
 var logger = require('log4js').getLogger()
 
-
 var protoEvent = 126604963;
-var testEvent = 126685328;
+var testEvent = 126728658;
 
-var logoAlbum = 235566068;
-var photoAlbum = 235566121;
+var docUrl ='https://vk.com/doc-126604963_437738617?hash=f711b606041fe13bff&dl=1470974169b2a10568b19ccda37b&api=1'
+
 
 function getGroup(vk, id){
   return vk.api('groups.getById', {
@@ -25,78 +24,130 @@ describe('event builder', function() {
 
   var vk;
   var builder
-  before(function(){
+  before(function(done){
     vk = new VK(process.env.VK_EMAIL, process.env.VK_PASS, process.env.VK_CLIENTID)
     vk.setDb(process.env.DB_URL)
     builder = new EventBuilder(vk)
     
-    return getGroup(vk, testEvent)
-    .then(function(events){
-      testEvent = events[0]
-    })
-    .then(function(){
-      return getGroup(vk, protoEvent)
-    })
-    .then(function(events){
-      protoEvent = events[0]
-    })
-
+    done()
   })
 
-  it('get proto', function() {
-    return builder.getProto(protoEvent.id)
-    .then(function(resp){
-      expect(resp.name).to.be('Мелькомбинат 2way')
-      expect(resp.links).to.be.a('array')
-      expect(resp.photoAlbums).to.have.property('photo')
-      expect(resp.photoAlbums).to.have.property('logo')
+  it('get proto', function(){
+    return builder.getFullInfo(protoEvent)
+    .then(function(event){
+      expect(event.id).to.be(protoEvent)
+      expect(event.status).to.be('proto')
+      expect(event.name).to.be('Мелькомбинат 2way')
+      expect(event.place).to.be.ok()
+      expect(event.links).to.be.a('array')
+      var keys = [
+        'description',
+        'access',
+        'subject',
+        'wall',
+        'topics',
+        'photos',
+        'video',
+        'audio',
+        'docs',
+        'age_limits'      
+      ];
+      keys.forEach(function(key){
+        expect(event.settings).to.have.property(key)
+      })
+      expect(event.albums).to.be.a('array')
+      event.albums.forEach(function(album) {
+        expect(album).to.have.property('title')
+        if(album.size){
+          expect(album.photos).to.be.a('array')
+          album.photos.forEach(function(photo) {
+            expect(photo).to.have.property('url')
+          })
+        }
+      })
+      expect(event.docs).to.be.a('array')
+      event.docs.forEach(function(doc) {
+        expect(doc).to.have.property('title')
+        expect(doc).to.have.property('url')
+      })
+      expect(event.page).to.be.a('object')
+      expect(event.page).to.have.property('title')
+      expect(event.page).to.have.property('source')
     })
-  });
+  })
 
-  it('get random photo', function() {
-    return builder.getRandomPhoto(protoEvent.id, 'logo')
-    .then(function(resp){
-      expect(resp).to.have.property('url')
-    })
-  });
-
-  it('get events', function() {
-    return builder.getEvents()
-    .then(function(events){
-      events.forEach(function(event){
-        expect(event).to.have.property('start_date')
+  it('get target', function(){
+    return builder.getFullInfo(testEvent)
+    .then(function(event){
+      expect(event.id).to.be(testEvent)
+      expect(event.name).to.be('Тестовое мероприятие')
+      var keys = [
+        'description',
+        'access',
+        'subject',
+        'wall',
+        'topics',
+        'photos',
+        'video',
+        'audio',
+        'docs',
+        'age_limits'      
+      ];
+      keys.forEach(function(key){
+        expect(event.settings).to.have.property(key)
+      })
+      expect(event.albums).to.be.a('array')
+      event.albums.forEach(function(album) {
+        if(album.size){
+          expect(album.photos).to.be.a('array')
+          album.photos.forEach(function(photo) {
+            expect(photo).to.have.property('url')
+          })
+        }
+      })
+      expect(event.docs).to.be.a('array')
+      event.docs.forEach(function(doc) {
+        expect(doc).to.have.property('title')
+        expect(doc).to.have.property('url')
       })
     })
-  });
-
-  it('get settings', function(){
-    return builder.getSettings(protoEvent.id)
-    .then(console.log)
   })
 
-  it('create event', function(){
-    return builder.create('Мелькомбинат 2way', new Date('2017-01-01'))
-    .then(console.log)
+  it('create event', function() {
+    return builder.create('Мелькомбинат 2way', '1.01.2017')
   })
 
-  it('set photos', function(){
-    return builder.setPhotos({id: photoAlbum, owner_id: protoEvent.id * -1}, {id: testEvent})
+  it('download doc', function() {
+    return vk.docs.download(docUrl, '/tmp/vkdoc'+(new Date()*1))
+
   })
 
-  it('set logo', function(){
-    return vk.api('groups.getById', {group_id: testEvent})
-    .then(function(events){
-      return builder.setLogo({id: logoAlbum, owner_id: protoEvent.id * -1}, events[0])
+  it('upload doc', function(){
+    return vk.docs.upload(testEvent, './file.doc')
+  })
+
+  it('copy doc', function(){
+    return vk.docs.uploadToGroup(testEvent, {
+      url: docUrl,
+      title: 'Тестовый документ '+ (new Date()*1) +'.doc'
     })
   })
 
-  it('set page', function(){
-    return builder.setPage(protoEvent, testEvent)
-
+  it('get videos', function(){
+    return builder.getVideos(protoEvent)
+    .then(function(videos){
+      expect(videos).to.be.a('array')
+      videos.forEach(function(video){
+        expect(video).to.have.property('title')
+        expect(video).to.have.property('owner_id')
+      })
+    })
   })
 
-  it('set links', function(){
-    return builder.setLinks(protoEvent, testEvent)
+  it('update logo', function () {
+    return builder.setLogo({
+      url: 'http://cs636724.vk.me/v636724930/2eccf/a5zszwky7U8.jpg',
+    }, testEvent)
   })
 
 });
