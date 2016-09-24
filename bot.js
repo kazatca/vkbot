@@ -63,6 +63,10 @@ function loop(){
   .then(loop)
 
   .catch(function(err){
+    if(err.error_code == 10){
+    	loop();
+	return
+    }
     vk.done()
     logger.error(err);
   })
