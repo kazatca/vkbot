@@ -65,7 +65,7 @@ function loop(){
   .catch(function(err){
     if(err.error_code == 10){
     	loop();
-	return
+      return;
     }
     vk.done()
     logger.error(err);
