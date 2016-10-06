@@ -6,7 +6,7 @@ var CaptchaSolver = require('./lib/2captcha.js');
 
 
 var dbUrl = process.env[process.env.DB_URL_KEY]
-
+logger.debug(dbUrl)
 var vk = new VK(process.env.VK_EMAIL, process.env.VK_PASS, process.env.VK_CLIENTID);
 vk.setDb(dbUrl)
 var captchaSolver = new CaptchaSolver(process.env.CAPTCHA_SOLVER_TOKEN)
